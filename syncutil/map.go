@@ -49,3 +49,21 @@ func (sm *SyncMap[K, V]) Clear() {
 		return true
 	})
 }
+
+func (sm *SyncMap[K, V]) Keys() []K {
+	keys := make([]K, 0)
+	sm.m.Range(func(key, _ any) bool {
+		keys = append(keys, key.(K))
+		return true
+	})
+	return keys
+}
+
+func (sm *SyncMap[K, V]) Values() []V {
+	values := make([]V, 0)
+	sm.m.Range(func(_, value any) bool {
+		values = append(values, value.(V))
+		return true
+	})
+	return values
+}
