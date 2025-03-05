@@ -89,7 +89,12 @@ func (sm *SyncMap[K, V]) Merge(other *SyncMap[K, V]) {
 }
 
 func (sm *SyncMap[K, V]) IsEmpty() bool {
-	return sm.Len() == 0
+	empty := true
+	sm.m.Range(func(_, _ any) bool {
+		empty = false
+		return false
+	})
+	return empty
 }
 
 func (sm *SyncMap[K, V]) Contains(key K) bool {
