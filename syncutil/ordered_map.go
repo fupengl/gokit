@@ -89,3 +89,36 @@ func (om *OrderedMap[K, V]) Range(f func(key K, value V) bool) {
 		}
 	}
 }
+
+func (om *OrderedMap[K, V]) Copy() *OrderedMap[K, V] {
+	newMap := NewOrderedMap[K, V]()
+	om.Range(func(key K, value V) bool {
+		newMap.Set(key, value)
+		return true
+	})
+	return newMap
+}
+
+func (om *OrderedMap[K, V]) Merge(other *OrderedMap[K, V]) {
+	other.Range(func(key K, value V) bool {
+		om.Set(key, value)
+		return true
+	})
+}
+
+func (om *OrderedMap[K, V]) IsEmpty() bool {
+	return om.Len() == 0
+}
+
+func (om *OrderedMap[K, V]) Clear() {
+	om.mu.Lock()
+	defer om.mu.Unlock()
+	om.items = make(map[K]V)
+	om.keys = make([]K, 0)
+	om.index = make(map[K]int)
+}
+
+func (om *OrderedMap[K, V]) Contains(key K) bool {
+	_, exists := om.items[key]
+	return exists
+}

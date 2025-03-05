@@ -6,6 +6,10 @@ type SyncMap[K comparable, V any] struct {
 	m sync.Map
 }
 
+func NewSyncMap[K comparable, V any]() *SyncMap[K, V] {
+	return &SyncMap[K, V]{}
+}
+
 func (sm *SyncMap[K, V]) Store(key K, value V) {
 	sm.m.Store(key, value)
 }
@@ -66,4 +70,29 @@ func (sm *SyncMap[K, V]) Values() []V {
 		return true
 	})
 	return values
+}
+
+func (sm *SyncMap[K, V]) Copy() *SyncMap[K, V] {
+	newMap := NewSyncMap[K, V]()
+	sm.Range(func(key K, value V) bool {
+		newMap.Store(key, value)
+		return true
+	})
+	return newMap
+}
+
+func (sm *SyncMap[K, V]) Merge(other *SyncMap[K, V]) {
+	other.Range(func(key K, value V) bool {
+		sm.Store(key, value)
+		return true
+	})
+}
+
+func (sm *SyncMap[K, V]) IsEmpty() bool {
+	return sm.Len() == 0
+}
+
+func (sm *SyncMap[K, V]) Contains(key K) bool {
+	_, ok := sm.Load(key)
+	return ok
 }
